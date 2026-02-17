@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { Lock, UserPlus } from "lucide-react";
 import type { FormEvent } from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   buttonHover,
   buttonTap,
@@ -12,6 +13,7 @@ import {
 } from "../constants/animations";
 import { getThemeClasses } from "../constants/theme";
 import { useThemeStore } from "../stores/theme-store";
+import { useAuth } from "../hooks/useAuth";
 
 const LoginPage = () => {
   const [userId, setUserId] = useState("");
@@ -19,10 +21,22 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { isDark } = useThemeStore();
   const theme = getThemeClasses(isDark);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
+
+    try {
+      await login({ userId, password });
+      navigate("/");
+      toast.success("로그인 성공");
+    } catch (err: any) {
+      toast.error(err.message || "아이디 또는 비밀번호가 올바르지 않습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -66,24 +80,17 @@ const LoginPage = () => {
             variants={itemVariants}
           >
             <div className="grid gap-5 sm:grid-cols-2">
-              <motion.label
-                className="flex flex-col gap-2.5"
-                variants={itemVariants}
-              >
+              <label className="flex flex-col gap-2.5">
                 <span className={`text-sm font-semibold ${theme.text.label}`}>
                   사용자 아이디
                 </span>
                 <input
                   className={`
-                    rounded-2xl
-                    border ${theme.input.border}
-                    ${theme.input.bg}
+                    rounded-2xl border ${theme.input.border} ${theme.input.bg}
                     px-3 py-2.5 text-sm outline-none transition-all
                     sm:px-5 sm:py-3.5 sm:text-base
-                    ${theme.input.placeholder}
-                    ${theme.input.text}
-                    ${theme.input.focusBorder}
-                    focus:ring-2 ${theme.input.focusRing}
+                    ${theme.input.placeholder} ${theme.input.text}
+                    ${theme.input.focusBorder} focus:ring-2 ${theme.input.focusRing}
                   `}
                   placeholder="user123"
                   type="text"
@@ -91,25 +98,18 @@ const LoginPage = () => {
                   onChange={(event) => setUserId(event.target.value)}
                   disabled={isLoading}
                 />
-              </motion.label>
-              <motion.label
-                className="flex flex-col gap-2.5"
-                variants={itemVariants}
-              >
+              </label>
+              <label className="flex flex-col gap-2.5">
                 <span className={`text-sm font-semibold ${theme.text.label}`}>
                   접속 비밀번호
                 </span>
                 <input
                   className={`
-                    rounded-2xl
-                    border ${theme.input.border}
-                    ${theme.input.bg}
+                    rounded-2xl border ${theme.input.border} ${theme.input.bg}
                     px-3 py-2.5 text-sm outline-none transition-all
                     sm:px-5 sm:py-3.5 sm:text-base
-                    ${theme.input.placeholder}
-                    ${theme.input.text}
-                    ${theme.input.focusBorder}
-                    focus:ring-2 ${theme.input.focusRing}
+                    ${theme.input.placeholder} ${theme.input.text}
+                    ${theme.input.focusBorder} focus:ring-2 ${theme.input.focusRing}
                   `}
                   placeholder="••••••••"
                   type="password"
@@ -117,7 +117,7 @@ const LoginPage = () => {
                   onChange={(event) => setPassword(event.target.value)}
                   disabled={isLoading}
                 />
-              </motion.label>
+              </label>
             </div>
 
             <motion.button
@@ -140,8 +140,14 @@ const LoginPage = () => {
             <Link to="/signup">
               <motion.button
                 className={`
-                  w-full rounded-xl border ${theme.card.border} px-5 py-3 text-sm font-medium transition-all
-                  ${isDark ? "text-slate-200 hover:bg-white/5" : "text-zinc-600 hover:bg-zinc-50"}
+                  w-full rounded-xl border ${
+                    theme.card.border
+                  } px-5 py-3 text-sm font-medium transition-all
+                  ${
+                    isDark
+                      ? "text-slate-200 hover:bg-white/5"
+                      : "text-zinc-600 hover:bg-zinc-50"
+                  }
                 `}
                 whileHover={buttonHover}
                 whileTap={buttonTap}

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 import Layout from "./components/common/layout";
 import { ProtectedRoute } from "./components/common/protected-route";
@@ -42,10 +41,6 @@ const router = createHashRouter([
 ]);
 
 const App = () => {
-  useEffect(() => {
-    localStorage.clear();
-  }, []);
-
   return <RouterProvider router={router} />;
 };
 

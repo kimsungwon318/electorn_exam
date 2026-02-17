@@ -1,7 +1,9 @@
+import { AnimatePresence } from "framer-motion";
+import { Outlet, useLocation } from "react-router-dom";
+import { Toaster } from "sonner";
 import CustomTitleBar from "./custom-title-bar";
 import ThemeToggle from "./theme-toggle";
 import { useThemeStore } from "../../stores/theme-store";
-import { Outlet, useLocation } from "react-router-dom";
 
 const Layout = () => {
   const { isDark } = useThemeStore();
@@ -17,8 +19,11 @@ const Layout = () => {
             : "bg-linear-to-b from-zinc-50 via-white to-zinc-100 text-zinc-900"
         }`}
       >
-        <Outlet key={location.pathname} />
+        <AnimatePresence mode="wait">
+          <Outlet key={location.pathname} />
+        </AnimatePresence>
         <ThemeToggle />
+        <Toaster position="bottom-center" richColors />
       </div>
     </>
   );

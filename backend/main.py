@@ -5,6 +5,8 @@ import uvicorn
 from core.config import API_TITLE, API_VERSION, CORS_ORIGINS
 from core.database import Base, engine
 
+from routers.auth import router as auth_router
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=API_TITLE, version=API_VERSION)
@@ -17,6 +19,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router)
 
 @app.get("/")
 async def root():

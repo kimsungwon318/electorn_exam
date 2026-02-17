@@ -1,10 +1,17 @@
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 export const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = false;
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  if (isLoading) {
+    return null;
+  }
 
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    navigate("/", { replace: true });
+    return null;
   }
 
   return <>{children}</>;

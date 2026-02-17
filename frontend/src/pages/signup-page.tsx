@@ -1,7 +1,9 @@
 import { motion } from "framer-motion";
 import { BadgePlus, Lock } from "lucide-react";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import type { FormEvent } from "react";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import {
   buttonHover,
   buttonTap,
@@ -11,17 +13,39 @@ import {
 } from "../constants/animations";
 import { getThemeClasses } from "../constants/theme";
 import { useThemeStore } from "../stores/theme-store";
+import { useAuth } from "../hooks/useAuth";
 
 const SignupPage = () => {
   const [name, setName] = useState("");
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, _setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { isDark } = useThemeStore();
   const theme = getThemeClasses(isDark);
+  const { signup } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    setIsLoading(true);
+
+    try {
+      await signup({
+        organizationType: "company",
+        organizationId: undefined,
+        name,
+        userId,
+        password,
+      });
+
+      toast.success("회원가입 성공");
+      navigate("/login");
+    } catch (err: any) {
+      toast.error(err.message || "회원가입 실패");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -64,28 +88,6 @@ const SignupPage = () => {
             variants={itemVariants}
           >
             <div className="grid gap-5 sm:grid-cols-2">
-              <motion.label
-                className="flex flex-col gap-2.5 sm:col-span-2"
-                variants={itemVariants}
-              >
-                <span className={`text-sm font-semibold ${theme.text.label}`}>
-                  소속 조직
-                </span>
-                <select
-                  className={`
-                    rounded-2xl border ${theme.input.border} ${theme.input.bg}
-                    px-3 py-2.5 text-sm outline-none transition-all
-                    sm:px-5 sm:py-3.5 sm:text-base
-                    ${theme.input.placeholder} ${theme.input.text}
-                    ${theme.input.focusBorder} focus:ring-2 ${theme.input.focusRing}
-                  `}
-                  value={""}
-                  onChange={() => {}}
-                  disabled={isLoading}
-                >
-                  <option value="">조직을 선택하세요</option>
-                </select>
-              </motion.label>
               <motion.label
                 className="flex flex-col gap-2.5"
                 variants={itemVariants}
