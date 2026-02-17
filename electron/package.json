@@ -1,0 +1,13 @@
+{
+  "name": "electron-app",
+  "version": "1.0.0",
+  "description": "electron app",
+  "main": "main.js",
+  "scripts": {
+    "start": "cd ../frontend && npm run build && cd ../electron && electron .",
+    "dev": "electron . --dev"
+  },
+  "devDependencies": {
+    "electron": "^40.3.0"
+  }
+}
